@@ -2,7 +2,7 @@ var mysql = require('mysql');
 /* If the node mysql module is not found on your system, you may
  * need to do an "npm install -g mysql". */
 
-var dbConnection = mysql.createClient({
+var dbConnection = mysql.createConnection({
   user: "",
   password: "",
   database: "chat"
