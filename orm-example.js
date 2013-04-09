@@ -1,6 +1,6 @@
-/* You'll need to 
+/* You'll need to
  * npm install sequelize
- * before running this example. Documentation is at http://sequelizejs.com/ 
+ * before running this example. Documentation is at http://sequelizejs.com/
  */
 
 var Sequelize = require("sequelize");
