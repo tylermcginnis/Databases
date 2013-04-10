@@ -2,31 +2,32 @@
  * for these tests to pass. */
 
 var mysql = require('mysql');
-var request = require("request");
+var request = require("request"); // You might need to npm install the request module!
 
 describe("Persistent Node Chat Server", function() {
   var dbConnection;
 
   beforeEach(function() {
     dbConnection = mysql.createConnection({
+    /* TODO: Fill this out with your mysql username */
       user: "",
+    /* and password. */
       password: "",
       database: "chat"
     });
-    /* TODO - You'll need to fill this out with your mysql username
-     * and password. */
     dbConnection.connect();
+
+    var tablename = ""; // TODO: fill this out
 
     /* Empty the db table before each test so that multiple tests
      * (or repeated runs of the tests) won't screw each other up: */
-    var tablename = ""; // TODO fill this out
     dbConnection.query("DELETE FROM " + tablename);
   });
 
   afterEach(function() {
     dbConnection.end();
   });
-             
+
   it("Should insert posted messages to the DB", function(done) {
     // Post a message to the node chat server:
     request({method: "POST",
@@ -37,10 +38,11 @@ describe("Persistent Node Chat Server", function() {
             function(error, response, body) {
               /* Now if we look in the database, we should find the
                * posted message there. */
-              
+
               var queryString = "";
               var queryArgs = [];
-              /* TODO - The exact query string and query args to use
+              /* TODO: Change the above queryString & queryArgs to match your schema design
+               * The exact query string and query args to use
                * here depend on the schema you design, so I'll leave
                * them up to you. */
               dbConnection.query( queryString, queryArgs,
@@ -49,7 +51,7 @@ describe("Persistent Node Chat Server", function() {
                   expect(results.length).toEqual(1);
                   expect(results[0].username).toEqual("Valjean");
                   expect(results[0].message).toEqual("In mercy's name, three days is all I need.");
-                  /* TODO You will need to change these tests if the
+                  /* TODO: You will need to change these tests if the
                    * column names in your schema are different from
                    * mine! */
 
@@ -78,5 +80,5 @@ describe("Persistent Node Chat Server", function() {
             done();
           });
       });
-  });  
+  });
 });
