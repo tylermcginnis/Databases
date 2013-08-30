@@ -56,6 +56,7 @@ var handlePostMessage = function(request, roomName, connect){
   });
 
   request.on('end', function(){
+    console.log('messageData', messageData);
     var parsedData = JSON.parse(messageData);
     var messageObj = {};
     messageObj.username = parsedData.username;
@@ -65,11 +66,6 @@ var handlePostMessage = function(request, roomName, connect){
     connect.query("INSERT INTO messages SET ?", messageObj, function(err,res){});
   });
 };
-
-/*
-{"general":{"0":{"username":"Tyler","text":"fafwa","roomname":"general",
-   "createdAt":"2013-08-30T05:26:44.911Z"}}}
-*/
 
 var handleGetMessages = function(request, response, roomName, connect){
   request.on("error", function(){
@@ -83,23 +79,12 @@ var handleGetMessages = function(request, response, roomName, connect){
   });
 };
 
-// var firstConnection = function(connect){
-//   var results = connect.query("SELECT * FROM messages", function(err, res, fields){
-//      messages = res;
-//      console.log(messages);
-//   });
-// };
-
 var handleGetChatrooms = function(request, response){
-  // var keys = Object.keys(messages);
-  // response.write(JSON.stringify(keys));
-  // console.log(keys);
   response.write('[]');
 };
 
 exports.handlePostMessage = handlePostMessage;
 exports.handleGetMessages = handleGetMessages;
-// exports.firstConnection = firstConnection;
 exports.handleGetChatrooms = handleGetChatrooms;
 exports.handleStaticRequests = handleStaticRequests;
 exports.dbConnection = dbConnection;

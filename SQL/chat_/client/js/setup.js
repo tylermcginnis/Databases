@@ -93,6 +93,7 @@ var getMessagesSuccess = function(response){
   // $.map(messageViews, function(messageView){
   //   $('#container').append(messageView.render());
   // });
+
   $('#container').html($.map(JSON.parse(response), function(data){
     return new MessageView({model: new Message(data)}).render();
   }));
