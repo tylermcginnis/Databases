@@ -58,7 +58,7 @@ var requestListener = function (request, response) {
   } else if (request.method === 'GET'){
     if(splitPath[0] === 'messages') {
       rh.handleGetMessages(request, response, splitPath[1], connect);
-      response.end();
+      // response.end();
     } else if(splitPath[0] === 'chatrooms'){
       rh.handleGetChatrooms(request, response);
       response.end();
@@ -76,9 +76,9 @@ var port = 8080;
 var ip = "127.0.0.1";
 
 var server = http.createServer(requestListener);
-server.on('connection', function(){
-  rh.firstConnection(connect);
-});
+// server.on('connection', function(){
+//   rh.firstConnection(connect);
+// });
 server.on('end', function(){
   connect.end(); //not sure if this is best practice but it works.
 });

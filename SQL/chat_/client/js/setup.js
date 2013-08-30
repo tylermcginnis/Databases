@@ -4,12 +4,12 @@ var friendHash = {};
 
 var setLink = function(){
   var link = "http://127.0.0.1:8080/messages/";
-    if(obj.roomname !== undefined){
-      link += obj.roomname;
-    } else {
-      link += "general";
-    }
-    return link;
+  if(obj.roomname !== undefined){
+    link += obj.roomname;
+  } else {
+    link += "general";
+  }
+  return link;
 };
 
 var Message = Backbone.Model.extend();
@@ -17,7 +17,7 @@ var Message = Backbone.Model.extend();
 var MessageView = Backbone.View.extend({
   render: function(){
     var name = $('<span/>').text(this.model.get("username")).addClass('name');
-    var txt = $('<span/>').text(": " +this.model.get("text"));
+    var txt = $('<span/>').text(": " +this.model.get("message"));
     this.$el.append(name).append(txt);
 
     if(friendHash[this.model.get("username")]) {
@@ -77,34 +77,36 @@ $(document).ready(function(){
     }
   });
 
-  setInterval(function(){
-    $.ajax(setLink(), {
-      contentType: 'application/json',
-      data: {
-        order: '-createdAt',
-        limit: '30'
-      },
-      success: function(response){
-        response = JSON.parse(response);
-        // console.log(results);
-        $('#container').html('');
-        var input;
+var getMessagesSuccess = function(response){
+  // response = JSON.parse(response);
+  // $('#container').html('');
+  // var input;
 
-        var messages = $.map(response.results, function(messageData){
-          return new Message(messageData);
-        });
+  // var messages = $.map(response, function(messageData){
+  //   return new Message(messageData);
+  // });
 
-        var messageViews = $.map(messages, function(message){
-          return new MessageView({model: message});
-        });
+  // var messageViews = $.map(messages, function(message){
+  //   return new MessageView({model: message});
+  // });
 
-        $.map(messageViews, function(messageView){
-          $('#container').append(messageView.render());
-        });
-      },
-      error: function(response) {
-        console.log('Ajax request failed because of : ' + response);
-      }
-    }); //end ajax
-  }, 2000);
+  // $.map(messageViews, function(messageView){
+  //   $('#container').append(messageView.render());
+  // });
+  $('#container').html($.map(JSON.parse(response), function(data){
+    return new MessageView({model: new Message(data)}).render();
+  }));
+};
+
+var getMessages = function(){
+  $.ajax(setLink(), {
+    contentType: 'application/json',
+    success: getMessagesSuccess,
+    error: function(response) {
+      console.log('Ajax request failed because of : ', arguments);
+    }
+  });
+};
+
+  setInterval(getMessages, 2000);
 }); //end document.ready

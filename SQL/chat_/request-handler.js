@@ -11,10 +11,6 @@ var dbConnection = function(){
 }
 
 
-var messages = {};
-messages.general = {};
-var messageKey = 0;
-
 var handleStaticRequests = function(request, response) {
   var filePath = './client' + request.url;
   if (filePath === '/client/') {
@@ -53,55 +49,57 @@ var handleStaticRequests = function(request, response) {
 };
 
 var handlePostMessage = function(request, roomName, connect){
-  // connect.query("INSERT INTO messages SET ?", {username: "tyler"}, function(err, res){});
-  //EXAMPLE OF HOW TO POST TO DB
   var messageData = '';
 
   request.on('data', function(data){
      messageData+=data;
   });
 
-
   request.on('end', function(){
-    var dataObj = {};
     var parsedData = JSON.parse(messageData);
-    var roomObj = messages[roomName] || {};
-    var messageKey = Object.keys(roomObj).length;
     var messageObj = {};
     messageObj.username = parsedData.username;
     messageObj.message = parsedData.text;
     messageObj.roomname = roomName;
     messageObj.timestamp = new Date();
     connect.query("INSERT INTO messages SET ?", messageObj, function(err,res){});
-    // roomObj[messageKey] = messageObj;
-    // messages[roomName] = roomObj; //USE LATER FOR FORMATTING the RESPONSE
-    // saveToFile();
   });
 };
+
+/*
+{"general":{"0":{"username":"Tyler","text":"fafwa","roomname":"general",
+   "createdAt":"2013-08-30T05:26:44.911Z"}}}
+*/
 
 var handleGetMessages = function(request, response, roomName, connect){
   request.on("error", function(){
     console.log("There was an error. Frick");
   });
   var messageObject = {};
-  messageObject.results = messages[roomName] || {};
-  response.write(JSON.stringify(messageObject));
-};
-
-var firstConnection = function(connect){
-  var results = connect.query("SELECT * FROM messages", function(err, res, fields){
-     messages = res;
+  messageObject.results = {};
+  connect.query("SELECT * FROM messages WHERE roomname = ?", [roomName], function(err, res){
+    messageObject.results = res;
+    response.end(JSON.stringify(messageObject.results));
   });
 };
 
+// var firstConnection = function(connect){
+//   var results = connect.query("SELECT * FROM messages", function(err, res, fields){
+//      messages = res;
+//      console.log(messages);
+//   });
+// };
+
 var handleGetChatrooms = function(request, response){
-  var keys = Object.keys(messages);
-  response.write(JSON.stringify(keys));
+  // var keys = Object.keys(messages);
+  // response.write(JSON.stringify(keys));
+  // console.log(keys);
+  response.write('[]');
 };
 
 exports.handlePostMessage = handlePostMessage;
 exports.handleGetMessages = handleGetMessages;
-exports.firstConnection = firstConnection;
+// exports.firstConnection = firstConnection;
 exports.handleGetChatrooms = handleGetChatrooms;
 exports.handleStaticRequests = handleStaticRequests;
 exports.dbConnection = dbConnection;
