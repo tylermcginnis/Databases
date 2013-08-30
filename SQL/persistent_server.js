@@ -57,7 +57,7 @@ var requestListener = function (request, response) {
     }
   } else if (request.method === 'GET'){
     if(splitPath[0] === 'messages') {
-      rh.handleGetMessages(request, response, splitPath[1]);
+      rh.handleGetMessages(request, response, splitPath[1], connect);
       response.end();
     } else if(splitPath[0] === 'chatrooms'){
       rh.handleGetChatrooms(request, response);
@@ -69,7 +69,6 @@ var requestListener = function (request, response) {
       response.writeHead(200, headers);
       response.end();
   }
-
 };
 
 var port = 8080;
@@ -78,8 +77,12 @@ var ip = "127.0.0.1";
 
 var server = http.createServer(requestListener);
 server.on('connection', function(){
-  rh.firstConnection();
+  rh.firstConnection(connect);
 });
+server.on('end', function(){
+  connect.end(); //not sure if this is best practice but it works.
+});
+
 console.log("Listening on http://" + ip + ":" + port);
 server.listen(port, ip);
 

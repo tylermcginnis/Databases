@@ -53,7 +53,8 @@ var handleStaticRequests = function(request, response) {
 };
 
 var handlePostMessage = function(request, roomName, connect){
-  connect.query("INSERT INTO messages SET ?", {username: "poop"}, function(err, res){});
+  // connect.query("INSERT INTO messages SET ?", {username: "tyler"}, function(err, res){});
+  //EXAMPLE OF HOW TO POST TO DB
   var messageData = '';
 
   request.on('data', function(data){
@@ -62,21 +63,23 @@ var handlePostMessage = function(request, roomName, connect){
 
 
   request.on('end', function(){
+    var dataObj = {};
     var parsedData = JSON.parse(messageData);
     var roomObj = messages[roomName] || {};
     var messageKey = Object.keys(roomObj).length;
     var messageObj = {};
     messageObj.username = parsedData.username;
-    messageObj.text = parsedData.text;
+    messageObj.message = parsedData.text;
     messageObj.roomname = roomName;
-    messageObj.createdAt = new Date();
-    roomObj[messageKey] = messageObj;
-    messages[roomName] = roomObj;
-    saveToFile();
+    messageObj.timestamp = new Date();
+    connect.query("INSERT INTO messages SET ?", messageObj, function(err,res){});
+    // roomObj[messageKey] = messageObj;
+    // messages[roomName] = roomObj; //USE LATER FOR FORMATTING the RESPONSE
+    // saveToFile();
   });
 };
 
-var handleGetMessages = function(request, response, roomName){
+var handleGetMessages = function(request, response, roomName, connect){
   request.on("error", function(){
     console.log("There was an error. Frick");
   });
@@ -85,22 +88,9 @@ var handleGetMessages = function(request, response, roomName){
   response.write(JSON.stringify(messageObject));
 };
 
-var firstConnection = function(){
-  var data = '';
-  fs.readFile('./messageData.txt','utf8', function(err, data){
-    if(!err){
-    messages = JSON.parse(data);
-  }
-  });
-};
-
-var saveToFile = function() {
-  fs.writeFile("./messageData.txt", JSON.stringify(messages), function(err){
-    if(err){
-      console.log('there was an error');
-    } else{
-      console.log('Successfully wrote to file');
-    }
+var firstConnection = function(connect){
+  var results = connect.query("SELECT * FROM messages", function(err, res, fields){
+     messages = res;
   });
 };
 

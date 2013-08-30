@@ -103,7 +103,7 @@ $(document).ready(function(){
         });
       },
       error: function(response) {
-        console.log('Ajax request failed');
+        console.log('Ajax request failed because of : ' + response);
       }
     }); //end ajax
   }, 2000);
